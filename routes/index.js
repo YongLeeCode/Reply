@@ -5,5 +5,6 @@ routes.get('/', (req, res, next) => {
 });
 
 routes.use('/users', require('./users'));
+routes.use('/replies', require('./replies'));
 
 module.exports = routes;

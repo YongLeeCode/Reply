@@ -3,12 +3,13 @@ var app = express();
 var cors = require('cors');
 
 const mongodb = require('./db/connect');
-// const parser = require('body-parser');
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 9000;
 
 app.use(cors());
-// app.use(Parser.json());
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use(`/`, require(`./routes`));
 

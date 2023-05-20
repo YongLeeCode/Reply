@@ -1,68 +1,70 @@
 const mongodb = require('../db/connect');
 var ObjectID = require('mongodb').ObjectId;
 
-//get users' information
-const getUser = async (req, res, next) => {
-    const result = await mongodb.getDB().db('CSE341').collection('userInfo').find();
+//get all replies
+const getReplies = async(req, res, next) => {
+    const result = await mongodb.getDB().db('CSE341').collection('replies').find();
 
     result.toArray().then((items) => {
-        res.setHeader('content-Type', 'application/json');
+        res.setHeader('content-type', 'application/json');
         res.status(200).json(items);
-    })
+    });
 };
 
-//get one user information with ID
-const getSingle = async (req, res, next) => {
+//get one reply
+const getOneReply = async(req, res, next) => {
     var a_id = new ObjectID(req.params.id);
-    const result = await mongodb.getDB().db('CSE341').collection('userInfo').find({_id: a_id});
-
+    const result = 
+        await mongodb
+            .getDB()
+            .db('CSE341')
+            .collection('replies')
+            .find({_id: a_id});
+    
     (await result.count()) > 0
-    ? result.toArray().then((items) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(items);
-      })
-    : res.status(200).json({ message: `No document found.` });
-
-    // result.toArray().then((items) =>{
-    //     res.setHeader('content-Type', 'application/json');
-    //     res.status(200).json(items);
-    // })
+        ? result.toArray().then((items)=>{
+            res.setHeader('content-type', 'application/json');
+            res.status(200).json(items);
+        })
+        : res.status(200).json({message: 'no doc found'});
 };
 
-// post request
-const addUser = async (req, res, next) => {
-    const user = {
+///post reply
+const addReply = async(req, res, next) => {
+    const reply = {
         name: req.body.name,
-        age: req.body.age,
-        email: req.body.email,
-        phone: req.body.phone
+        reply: req.body.reply
     }
 
     try{
-        const result = await mongodb.getDB().db('CSE341').collection('userInfo').insertOne(user);
-        res.setHeader('Content-Type', 'application/json');
-        result 
+        const result = 
+            await mongodb
+                .getDB()
+                .db('CSE341')
+                .collection('replies')
+                .insertOne(reply);
+        res.setHeader('content-type', 'application/json');
+        result
             ? res
                 .status(201)
-                .json({message: 'Successfully added!', docId: result.insertedId.toString()})
+                .json({message:'added!'})
             : res
                 .status(204)
-                .json({message: 'Oh no. Cannot add the user!'});
-    } catch(error){
+                .json({message: 'failed :('});
+    }catch(error){
         console.log(error);
     }
 };
 
-
 // put request
-const updateUser = async (req, res, next) => {
+const updateReply = async (req, res, next) => {
     try{
         const o_id = new ObjectID(req.params.id);
         const data = 
             await mongodb
                 .getDB()
                 .db('CSE341')
-                .collection('userInfo')
+                .collection('replies')
                 .updateOne({_id: o_id}, {$set: req.body})
                 .then((result) => {
                     res.setHeader(`Content_Type`, `application/json`);
@@ -76,13 +78,13 @@ const updateUser = async (req, res, next) => {
 };
 
 // DELETE requests
-const deleteUser = async (req, res, next) => {
+const deleteReply = async (req, res, next) => {
     try {
       const o_id = new ObjectID(req.params.id);
       const _ = await mongodb
         .getDB()
         .db('CSE341')
-        .collection('userInfo')
+        .collection('replies')
         .deleteOne({ _id: o_id }, {})
         .then((result) => {
           result.deletedCount > 0
@@ -97,9 +99,9 @@ const deleteUser = async (req, res, next) => {
   };
 
 module.exports = {
-    getUser,
-    getSingle,
-    addUser,
-    updateUser,
-    deleteUser
+    getReplies,
+    getOneReply,
+    addReply,
+    updateReply,
+    deleteReply
 };
